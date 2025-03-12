@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Response Time Tracker</title>
+</head>
+<body>
+    <h1>Text Response Time Tracker</h1>
+
+    <h2>Arguing</h2>
+    <button onclick="logSentTime('arguing')">Log Sent Time</button>
+    <button onclick="logReceivedTime('arguing')">Log Received Time</button>
+    <h3>Last Response Time: <span id="lastResponseTimeArguing">N/A</span></h3>
+    <h3>Average Response Time: <span id="avgResponseTimeArguing">N/A</span></h3>
+
+    <h2>Talking Normally</h2>
+    <button onclick="logSentTime('normal')">Log Sent Time</button>
+    <button onclick="logReceivedTime('normal')">Log Received Time</button>
+    <h3>Last Response Time: <span id="lastResponseTimeNormal">N/A</span></h3>
+    <h3>Average Response Time: <span id="avgResponseTimeNormal">N/A</span></h3>
+
+    <h2>Overall</h2>
+    <h3>Average Response Time (Overall): <span id="avgResponseTimeOverall">N/A</span></h3>
+
+    <script>
+        let sentTimes = {
+            arguing: null,
+            normal: null
+        };
+        let responseTimes = {
+            arguing: [],
+            normal: []
+        };
+
+        function logSentTime(category) {
+            sentTimes[category] = new Date(); // Log the current time for the selected category
+            console.log(`${category} - Message sent at: ` + sentTimes[category]);
+        }
+
+        function logReceivedTime(category) {
+            if (!sentTimes[category]) {
+                alert(`You need to log the sent time for ${category} first!`);
+                return;
+            }
+
+            const receivedTime = new Date(); // Log the current time when the response is received
+            const responseTime = (receivedTime - sentTimes[category]) / 1000; // Time difference in seconds
+            responseTimes[category].push(responseTime);
+
+            document.getElementById(`lastResponseTime${capitalizeFirstLetter(category)}`).textContent = `${responseTime} seconds`;
+
+            // Calculate average response time for the category
+            const totalResponseTime = responseTimes[category].reduce((acc, time) => acc + time, 0);
+            const avgResponseTime = totalResponseTime / responseTimes[category].length;
+            document.getElementById(`avgResponseTime${capitalizeFirstLetter(category)}`).textContent = `${avgResponseTime.toFixed(2)} seconds`;
+
+            // Calculate overall average response time
+            const allResponseTimes = [...responseTimes.arguing, ...responseTimes.normal];
+            const totalOverallResponseTime = allResponseTimes.reduce((acc, time) => acc + time, 0);
+            const avgOverallResponseTime = totalOverallResponseTime / allResponseTimes.length;
+            document.getElementById("avgResponseTimeOverall").textContent = `${avgOverallResponseTime.toFixed(2)} seconds`;
+
+            console.log(`${category} - Message received at: ${receivedTime}, Response time: ${responseTime} seconds`);
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    </script>
+</body>
+</html>
